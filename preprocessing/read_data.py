@@ -3,6 +3,8 @@ import requests
 from collections import defaultdict
 from readability import Document
 from bs4 import BeautifulSoup
+import dill as pickle
+from time import time
 
 
 
@@ -27,25 +29,32 @@ with open(data_path, 'r') as csvfile:
 
         i += 1
 
-### Build Vocablurary
-def visible(element):
-    if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
-        return False
-    elif re.match('<!--.*-->', str(element.encode('utf-8'))):
-        return False
-    return True
+print('Data read. %i dataopints.' %(len(data)))
+data2 = defaultdict(dict)
+### get the text
+s = time()
+for i in list(data.keys())[:1000]:
 
+    # logging
+    if i % 100 == 0 and i != 0:
+        print("100 datapoints processed. Time: %.2f" %(time()-s))
+        s = time()
 
-vocab = set()
-for i in list(data.keys())[1:2]:
-    print(data[i]['url'])
-    print(data[i]['title'])
+    # get text from url
+    try:
+        r = requests.get(url=data[i]['url'])
+        doc = Document(r.text)
+        summary = doc.summary()
+    except:
+        continue
 
-    # build request
-    r = requests.get(url=data[i]['url'])
-    doc = Document(r.text)
-    summary = doc.summary()
     soup = BeautifulSoup(summary, 'html.parser')
-    print(soup.get_text())
+    text = soup.get_text()
 
-    print()
+
+    data2[i] = data[i]
+    data2[i]['text'] = text
+
+
+
+pickle.dump(data, open('data2.p','wb'))
