@@ -1,13 +1,13 @@
 import csv
 import requests
 from collections import defaultdict
+from readability import Document
 from bs4 import BeautifulSoup
-import re
 
 
 
 ### Read in data
-data_path = '../data/newsCorpora.csv'
+data_path = '../../data/newsCorpora.csv'
 
 data = defaultdict(dict)
 with open(data_path, 'r') as csvfile:
@@ -37,12 +37,15 @@ def visible(element):
 
 
 vocab = set()
-for i in list(data.keys())[1:10]:
+for i in list(data.keys())[1:2]:
     print(data[i]['url'])
     print(data[i]['title'])
 
     # build request
     r = requests.get(url=data[i]['url'])
-    soup = BeautifulSoup(r.text, 'html.parser')
-    text = BeautifulSoup.get_text()
-    print(text)
+    doc = Document(r.text)
+    summary = doc.summary()
+    soup = BeautifulSoup(summary, 'html.parser')
+    print(soup.get_text())
+
+    print()
