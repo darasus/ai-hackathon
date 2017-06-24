@@ -1,6 +1,5 @@
 import csv
 import requests
-from collections import defaultdict
 from readability import Document
 from bs4 import BeautifulSoup
 import dill as pickle
@@ -14,7 +13,7 @@ lem = WordNetLemmatizer()
 ### Read in data
 data_path = '../../data/newsCorpora.csv'
 
-data = defaultdict(dict)
+data = dict()
 
 with open(data_path, 'r') as csvfile:
     csv_reader = csv.reader(csvfile, delimiter='\t')
@@ -23,6 +22,7 @@ with open(data_path, 'r') as csvfile:
         if row[4] == 'e':
             assert len(row) == 8, "Datapoint %i has length %i, expected 8" %(i, len(row))
 
+            data[i]                 = dict()
             data[i]['id']           = row[0]
             data[i]['title']        = row[1]
             data[i]['url']          = row[2]
@@ -47,11 +47,11 @@ print('Data read. %i dataopints.' %(len(data)))
 ### get the text
 s = time()
 n = 0
-p_data = defaultdict(dict)
+p_data = dict()
 
 for i in list(data.keys()):
 
-    while n < 1000:
+    if n < 1000:
 
         if data[i]['category'] == 'e': # only use entertainment articles
 
@@ -68,6 +68,9 @@ for i in list(data.keys()):
             except:
                 print("Skipped datapoint %i" %(i))
                 continue
+
+
+
 
             # process text
             soup = BeautifulSoup(summary, 'html.parser')
@@ -94,14 +97,16 @@ for i in list(data.keys()):
             text = re.sub('\t', '', text)
             text = re.sub('\\\\', '', text)
 
+            p_data[n]                   = dict()
             p_data[n]['id']             = data[i]['id']
-            p_data[n]['title']          = data[n]['title']
-            p_data[n]['url']            = data[n]['url']
-            p_data[n]['publisher']      = data[n]['publisher']
-            p_data[n]['category']       = data[n]['category']
-            p_data[n]['story']          = data[n]['story']
-            p_data[n]['hostname']       = data[n]['hostname']
-            p_data[n]['timestamp']      = data[n]['timestamp'] 
+            p_data[n]['title']          = data[i]['title']
+            p_data[n]['url']            = data[i]['url']
+            p_data[n]['publisher']      = data[i]['publisher']
+            p_data[n]['category']       = data[i]['category']
+            p_data[n]['story']          = data[i]['story']
+            p_data[n]['hostname']       = data[i]['hostname']
+            p_data[n]['timestamp']      = data[i]['timestamp']
+
             p_data[n]['text']           = text
             p_data[n]['sentences']      = sent_tokenize(p_data[n]['text'])
             p_data[n]['p_sentences']    = sent_tokenize(p_data[n]['text'])

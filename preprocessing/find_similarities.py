@@ -53,7 +53,7 @@ for q in queries:
     qv = sent2vec(q)
 
     def cos_sim(a, b):
-        return np.dot(a,b) / (np.sqrt(np.sum(a**2)) * np.sqrt(np.sum(b**2)))
+        return np.cos(np.dot(a,b) / (np.sqrt(np.sum(a**2)) * np.sqrt(np.sum(b**2))))
 
 
     for i in list(data.keys()):

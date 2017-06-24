@@ -13,7 +13,10 @@ def sent2vec(sent):
     sent_vec = np.ones(300)
     for w in sent.split():
         if w in model:
-            sent_vec *= model[w]
+            sent_vec += model[w]
+
+    _max = np.max(sent_vec)
+    sent_vec = sent_vec / _max
 
     return sent_vec
 
